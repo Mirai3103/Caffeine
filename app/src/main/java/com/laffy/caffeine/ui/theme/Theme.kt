@@ -1,9 +1,9 @@
 package com.laffy.caffeine.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -12,25 +12,63 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = CoffeePrimaryDark,
+    onPrimary = CoffeeOnPrimaryDark,
+    primaryContainer = CoffeePrimaryContainerDark,
+    onPrimaryContainer = CoffeeOnPrimaryContainerDark,
+    secondary = CoffeeSecondaryDark,
+    onSecondary = CoffeeOnSecondaryDark,
+    secondaryContainer = CoffeeSecondaryContainerDark,
+    onSecondaryContainer = CoffeeOnSecondaryContainerDark,
+    tertiary = CoffeeTertiaryDark,
+    onTertiary = CoffeeOnTertiaryDark,
+    tertiaryContainer = CoffeeTertiaryContainerDark,
+    onTertiaryContainer = CoffeeOnTertiaryContainerDark,
+    background = CoffeeBackgroundDark,
+    onBackground = CoffeeOnBackgroundDark,
+    surface = CoffeeBackgroundDark,
+    onSurface = CoffeeOnBackgroundDark,
+    surfaceVariant = CoffeeSurfaceVariantDark,
+    onSurfaceVariant = CoffeeOnSurfaceVariantDark,
+    outline = CoffeeOutlineDark,
+    outlineVariant = CoffeeOutlineVariantDark,
+    surfaceDim = CoffeeBackgroundDark,
+    surfaceBright = CoffeeSurfaceBrightDark,
+    surfaceContainerLowest = CoffeeSurfaceContainerLowestDark,
+    surfaceContainerLow = CoffeeSurfaceContainerLowDark,
+    surfaceContainer = CoffeeSurfaceContainerDark,
+    surfaceContainerHigh = CoffeeSurfaceContainerHighDark,
+    surfaceContainerHighest = CoffeeSurfaceContainerHighestDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = CoffeePrimaryLight,
+    onPrimary = CoffeeOnPrimaryLight,
+    primaryContainer = CoffeePrimaryContainerLight,
+    onPrimaryContainer = CoffeeOnPrimaryContainerLight,
+    secondary = CoffeeSecondaryLight,
+    onSecondary = CoffeeOnSecondaryLight,
+    secondaryContainer = CoffeeSecondaryContainerLight,
+    onSecondaryContainer = CoffeeOnSecondaryContainerLight,
+    tertiary = CoffeeTertiaryLight,
+    onTertiary = CoffeeOnTertiaryLight,
+    tertiaryContainer = CoffeeTertiaryContainerLight,
+    onTertiaryContainer = CoffeeOnTertiaryContainerLight,
+    background = CoffeeBackgroundLight,
+    onBackground = CoffeeOnBackgroundLight,
+    surface = CoffeeBackgroundLight,
+    onSurface = CoffeeOnBackgroundLight,
+    surfaceVariant = CoffeeSurfaceVariantLight,
+    onSurfaceVariant = CoffeeOnSurfaceVariantLight,
+    outline = CoffeeOutlineLight,
+    outlineVariant = CoffeeOutlineVariantLight,
+    surfaceDim = CoffeeSurfaceDimLight,
+    surfaceBright = CoffeeBackgroundLight,
+    surfaceContainerLowest = CoffeeSurfaceContainerLowestLight,
+    surfaceContainerLow = CoffeeSurfaceContainerLowLight,
+    surfaceContainer = CoffeeSurfaceContainerLight,
+    surfaceContainerHigh = CoffeeSurfaceContainerHighLight,
+    surfaceContainerHighest = CoffeeSurfaceContainerHighestLight
 )
 
 @Composable
@@ -50,8 +88,9 @@ fun CaffeineTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
+    MaterialExpressiveTheme(
         colorScheme = colorScheme,
+        motionScheme = MotionScheme.expressive(),
         typography = Typography,
         content = content
     )
