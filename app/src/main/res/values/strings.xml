@@ -10,6 +10,11 @@
     <string name="add_tile">Add to Quick Settings</string>
     <string name="tile_until">Until %s</string>
     <string name="tile_off">Off</string>
+    <string name="tile_infinite">No limit</string>
+    <string name="shortcut_10">10 minutes</string>
+    <string name="shortcut_20">20 minutes</string>
+    <string name="shortcut_inf">No limit</string>
+    <string name="shortcut_stop">Turn off</string>
     <string name="channel_name">Caffeine active</string>
     <string name="notif_title">Keeping the screen on</string>
     <string name="notif_stop">Turn off</string>

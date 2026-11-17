@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="m10"
+        android:enabled="true"
+        android:icon="@drawable/ic_coffee"
+        android:shortcutShortLabel="@string/shortcut_10">
+        <intent
+            android:action="com.laffy.caffeine.SHORTCUT"
+            android:targetClass="com.laffy.caffeine.ShortcutActivity"
+            android:targetPackage="com.laffy.caffeine">
+            <extra
+                android:name="duration"
+                android:value="10" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="m20"
+        android:enabled="true"
+        android:icon="@drawable/ic_coffee"
+        android:shortcutShortLabel="@string/shortcut_20">
+        <intent
+            android:action="com.laffy.caffeine.SHORTCUT"
+            android:targetClass="com.laffy.caffeine.ShortcutActivity"
+            android:targetPackage="com.laffy.caffeine">
+            <extra
+                android:name="duration"
+                android:value="20" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="inf"
+        android:enabled="true"
+        android:icon="@drawable/ic_coffee"
+        android:shortcutShortLabel="@string/shortcut_inf">
+        <intent
+            android:action="com.laffy.caffeine.SHORTCUT"
+            android:targetClass="com.laffy.caffeine.ShortcutActivity"
+            android:targetPackage="com.laffy.caffeine">
+            <extra
+                android:name="duration"
+                android:value="-1" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="stop"
+        android:enabled="true"
+        android:icon="@drawable/ic_coffee"
+        android:shortcutShortLabel="@string/shortcut_stop">
+        <intent
+            android:action="com.laffy.caffeine.SHORTCUT"
+            android:targetClass="com.laffy.caffeine.ShortcutActivity"
+            android:targetPackage="com.laffy.caffeine">
+            <extra
+                android:name="duration"
+                android:value="0" />
+        </intent>
+    </shortcut>
+</shortcuts>

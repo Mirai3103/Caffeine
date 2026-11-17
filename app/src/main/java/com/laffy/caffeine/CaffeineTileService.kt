@@ -8,29 +8,37 @@ import android.service.quicksettings.TileService
 import android.text.format.DateFormat
 import java.util.Date
 
-/** Quick Settings tile. Declared ACTIVE_TILE so the system only binds it on click / explicit update. */
+/**
+ * Quick Settings tile. Tap cycles Off → 10 → 15 → 20 → ∞ → Off ([CaffeineController.cycle]);
+ * long-press opens the app (QS_TILE_PREFERENCES on MainActivity).
+ * Declared ACTIVE_TILE so the system only binds it on click / explicit update.
+ */
 class CaffeineTileService : TileService() {
 
-    override fun onTileAdded() = refresh()
+    override fun onTileAdded() {
+        Prefs.setTileAdded(this, true)
+        refresh()
+    }
+
+    override fun onTileRemoved() = Prefs.setTileAdded(this, false)
 
     override fun onStartListening() = refresh()
 
     override fun onClick() {
-        CaffeineController.toggle(this)
+        CaffeineController.cycle(this)
         refresh()
     }
 
     private fun refresh() {
         val tile = qsTile ?: return
-        // Temporary until Task 4 rewrites the tile around Session/Duration.
-        val endAt = CaffeineState.session.value?.endAt ?: 0L
-        val active = endAt > System.currentTimeMillis()
-        tile.state = if (active) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        val session = CaffeineState.session.value?.takeIf { it.isActive(System.currentTimeMillis()) }
+        tile.state = if (session != null) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         if (Build.VERSION.SDK_INT >= 29) {
-            tile.subtitle = if (active) {
-                getString(R.string.tile_until, DateFormat.getTimeFormat(this).format(Date(endAt)))
-            } else {
-                getString(R.string.tile_off)
+            val endAt = session?.endAt
+            tile.subtitle = when {
+                session == null -> getString(R.string.tile_off)
+                endAt == null -> getString(R.string.tile_infinite)
+                else -> getString(R.string.tile_until, DateFormat.getTimeFormat(this).format(Date(endAt)))
             }
         }
         tile.updateTile()
