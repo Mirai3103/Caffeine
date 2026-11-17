@@ -54,6 +54,7 @@ import com.laffy.caffeine.CaffeineState
 import com.laffy.caffeine.CaffeineTileService
 import com.laffy.caffeine.Duration
 import com.laffy.caffeine.Prefs
+import com.laffy.caffeine.Privacy
 import com.laffy.caffeine.R
 import com.laffy.caffeine.Session
 import com.laffy.caffeine.isActive
@@ -127,6 +128,7 @@ fun CaffeineScreen(lifecycle: Lifecycle) {
                 }
             }
         },
+        onPrivacy = { Privacy.openPrivacyPolicy(context) },
     )
 }
 
@@ -145,6 +147,7 @@ internal fun CaffeineContent(
     onSelect: (Duration) -> Unit,
     onOption: (OptionKey, Boolean) -> Unit,
     onAddTile: () -> Unit,
+    onPrivacy: () -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(innerPadding)) {
@@ -154,7 +157,7 @@ internal fun CaffeineContent(
             val controls: @Composable () -> Unit = {
                 ControlsSection(
                     selected, stopOnScreenOff, stopOnUnplug, dimScreen, showAddTile,
-                    onSelect, onOption, onAddTile
+                    onSelect, onOption, onAddTile, onPrivacy
                 )
             }
             if (maxWidth > maxHeight) {
@@ -264,6 +267,7 @@ private fun ControlsSection(
     onSelect: (Duration) -> Unit,
     onOption: (OptionKey, Boolean) -> Unit,
     onAddTile: () -> Unit,
+    onPrivacy: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text(
@@ -283,6 +287,9 @@ private fun ControlsSection(
         TextButton(onClick = onAddTile, modifier = Modifier.heightIn(min = 48.dp)) {
             Text(stringResource(R.string.add_tile))
         }
+    }
+    TextButton(onClick = onPrivacy, modifier = Modifier.heightIn(min = 48.dp)) {
+        Text(stringResource(R.string.privacy))
     }
 }
 
@@ -330,6 +337,7 @@ private fun PreviewScreen(
         stopOnScreenOff = true, stopOnUnplug = false, dimScreen = false,
         showAddTile = showAddTile, reducedMotion = true,
         onToggle = {}, onExtend = {}, onSelect = {}, onOption = { _, _ -> }, onAddTile = {},
+        onPrivacy = {},
     )
 }
 
