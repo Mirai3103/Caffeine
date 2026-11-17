@@ -78,7 +78,9 @@ class MainActivity : ComponentActivity() {
 fun CaffeineScreen(lifecycle: Lifecycle) {
     val context = LocalContext.current
     val endAt by CaffeineState.endAt.collectAsState()
-    var minutes by remember { mutableIntStateOf(Prefs.minutes(context)) }
+    var minutes by remember {
+        mutableIntStateOf((Prefs.selected(context) as? Duration.Minutes)?.value ?: PRESET_MINUTES.first())
+    }
     var remainingMs by remember { mutableLongStateOf(0L) }
     val active = endAt > 0L && remainingMs > 0L
 
@@ -104,7 +106,7 @@ fun CaffeineScreen(lifecycle: Lifecycle) {
         minutes = minutes,
         onMinutes = {
             minutes = it
-            Prefs.setMinutes(context, it)
+            Prefs.setSelected(context, Duration.Minutes(it))
         },
         onToggle = { CaffeineController.toggle(context) },
         onAddTile = if (Build.VERSION.SDK_INT >= 33) ({ requestAddTile(context) }) else null
@@ -170,7 +172,7 @@ private fun CaffeineContent(
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp)
             )
-            val options = Prefs.OPTIONS_MINUTES
+            val options = PRESET_MINUTES
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 options.forEachIndexed { index, m ->
                     SegmentedButton(

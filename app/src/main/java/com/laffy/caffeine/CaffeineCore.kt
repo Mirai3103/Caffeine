@@ -5,22 +5,6 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/** Duration setting, stored in SharedPreferences (cheapest option, read synchronously and rarely). */
-object Prefs {
-    val OPTIONS_MINUTES = listOf(10, 15, 20)
-    private const val FILE = "caffeine"
-    private const val KEY_MINUTES = "minutes"
-
-    fun minutes(context: Context): Int =
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .getInt(KEY_MINUTES, OPTIONS_MINUTES.first())
-
-    fun setMinutes(context: Context, minutes: Int) {
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .edit().putInt(KEY_MINUTES, minutes).apply()
-    }
-}
-
 /** Process-wide state shared by the service, the tile and the UI. 0 = off, else wall-clock end time. */
 object CaffeineState {
     val endAt = MutableStateFlow(0L)
@@ -33,7 +17,9 @@ object CaffeineController {
 
     fun start(context: Context) {
         val app = context.applicationContext
-        val endAt = System.currentTimeMillis() + Prefs.minutes(app) * 60_000L
+        // Temporary until Task 3 rewrites the controller around Session/Duration.
+        val minutes = (Prefs.selected(app) as? Duration.Minutes)?.value ?: PRESET_MINUTES.first()
+        val endAt = System.currentTimeMillis() + minutes * 60_000L
         CaffeineState.endAt.value = endAt
         try {
             ContextCompat.startForegroundService(
