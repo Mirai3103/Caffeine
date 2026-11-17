@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Caffeine</string>
+    <string name="status_on">Your screen will stay on</string>
+    <string name="status_off">Screen follows the system timeout</string>
+    <string name="duration">Duration</string>
+    <string name="minutes_short">%d min</string>
+    <string name="duration_hint">Applies the next time you turn Caffeine on.</string>
+    <string name="turn_on">Turn on</string>
+    <string name="turn_off">Turn off</string>
+    <string name="add_tile">Add to Quick Settings</string>
+    <string name="tile_until">Until %s</string>
+    <string name="tile_off">Off</string>
+    <string name="channel_name">Caffeine active</string>
+    <string name="notif_title">Keeping the screen on</string>
+    <string name="notif_stop">Turn off</string>
+</resources>

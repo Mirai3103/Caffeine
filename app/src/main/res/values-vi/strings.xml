@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Caffeine</string>
+    <string name="status_on">Màn hình sẽ luôn sáng</string>
+    <string name="status_off">Màn hình tắt theo thời gian của hệ thống</string>
+    <string name="duration">Thời gian</string>
+    <string name="minutes_short">%d phút</string>
+    <string name="duration_hint">Áp dụng cho lần bật tiếp theo.</string>
+    <string name="turn_on">Bật</string>
+    <string name="turn_off">Tắt</string>
+    <string name="add_tile">Thêm vào Cài đặt nhanh</string>
+    <string name="tile_until">Đến %s</string>
+    <string name="tile_off">Tắt</string>
+    <string name="channel_name">Caffeine đang hoạt động</string>
+    <string name="notif_title">Đang giữ màn hình sáng</string>
+    <string name="notif_stop">Tắt</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single-colour version for Android 13+ themed icons (only alpha is used). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.09"
+        android:scaleY="0.09"
+        android:translateX="8.01"
+        android:translateY="6.2">
+
+        <!-- Sun rays -->
+        <path
+            android:pathData="M487,260 L487,312 M388,287 L414,332 M588,287 L561,332 M315,359 L360,385 M660,359 L616,385"
+            android:strokeColor="#FF000000"
+            android:strokeWidth="26"
+            android:strokeLineCap="round" />
+
+        <!-- Sun -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M380,462 A108,108 0 0 1 596,462 Z" />
+
+        <!-- Cup: top rim and lower body, with the band left as a gap -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M328,460 H648 V500 H328 Z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M328,528 H648 V590 A160,160 0 0 1 328,590 Z" />
+        <!-- Handle -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M648,488 A92,92 0 0 1 648,672 V632 A52,52 0 0 0 648,528 Z" />
+        <!-- Saucer -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M298,780 H678 A18,18 0 0 1 678,816 H298 A18,18 0 0 1 298,780 Z" />
+    </group>
+</vector>
