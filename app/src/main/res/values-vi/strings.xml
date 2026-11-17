@@ -4,8 +4,6 @@
     <string name="status_off">Màn hình tắt theo thời gian của hệ thống</string>
     <string name="duration">Thời gian</string>
     <string name="minutes_short">%d phút</string>
-    <string name="duration_hint">Áp dụng cho lần bật tiếp theo.</string>
-    <string name="turn_on">Bật</string>
     <string name="turn_off">Tắt</string>
     <string name="add_tile">Thêm vào Cài đặt nhanh</string>
     <string name="tile_until">Đến %s</string>
@@ -21,4 +19,19 @@
     <string name="notif_extend">+5 phút</string>
     <string name="notif_title_infinite">Giữ sáng không giới hạn</string>
     <string name="low_battery">Pin yếu — Caffeine không bật</string>
+    <string name="custom">Khác…</string>
+    <string name="custom_title">Thời gian tuỳ chỉnh</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Huỷ</string>
+    <string name="infinite">∞</string>
+    <string name="infinite_cd">Không giới hạn</string>
+    <string name="options">Tuỳ chọn</string>
+    <string name="opt_screen_off">Tắt khi tắt màn hình</string>
+    <string name="opt_unplug">Dừng khi rút sạc</string>
+    <string name="opt_dim">Làm tối thay vì sáng</string>
+    <string name="hero_state_on">Đang bật</string>
+    <string name="hero_state_off">Đang tắt</string>
+    <plurals name="remaining_cd">
+        <item quantity="other">Còn %d phút</item>
+    </plurals>
 </resources>
