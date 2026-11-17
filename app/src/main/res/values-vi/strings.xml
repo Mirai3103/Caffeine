@@ -13,4 +13,7 @@
     <string name="channel_name">Caffeine đang hoạt động</string>
     <string name="notif_title">Đang giữ màn hình sáng</string>
     <string name="notif_stop">Tắt</string>
+    <string name="notif_extend">+5 phút</string>
+    <string name="notif_title_infinite">Giữ sáng không giới hạn</string>
+    <string name="low_battery">Pin yếu — Caffeine không bật</string>
 </resources>

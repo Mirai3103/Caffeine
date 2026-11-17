@@ -22,7 +22,8 @@ class CaffeineTileService : TileService() {
 
     private fun refresh() {
         val tile = qsTile ?: return
-        val endAt = CaffeineState.endAt.value
+        // Temporary until Task 4 rewrites the tile around Session/Duration.
+        val endAt = CaffeineState.session.value?.endAt ?: 0L
         val active = endAt > System.currentTimeMillis()
         tile.state = if (active) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         if (Build.VERSION.SDK_INT >= 29) {

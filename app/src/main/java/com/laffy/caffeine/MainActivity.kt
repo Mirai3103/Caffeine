@@ -77,7 +77,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CaffeineScreen(lifecycle: Lifecycle) {
     val context = LocalContext.current
-    val endAt by CaffeineState.endAt.collectAsState()
+    // Temporary until Task 6 rewrites the screen around Session/Duration.
+    val session by CaffeineState.session.collectAsState()
+    val endAt = session?.endAt ?: 0L
     var minutes by remember {
         mutableIntStateOf((Prefs.selected(context) as? Duration.Minutes)?.value ?: PRESET_MINUTES.first())
     }
