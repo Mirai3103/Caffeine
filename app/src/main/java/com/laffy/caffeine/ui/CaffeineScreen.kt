@@ -114,10 +114,8 @@ fun CaffeineScreen(lifecycle: Lifecycle) {
                 OptionKey.Dim -> {
                     dimScreen = value
                     Prefs.setDimScreen(context, value)
-                    // The wake-lock level is chosen when armed: re-arm a running session now.
-                    if (CaffeineController.isActive()) {
-                        CaffeineState.session.value?.duration?.let { CaffeineController.start(context, it) }
-                    }
+                    // Re-arm so the wake-lock level follows the pref, but keep the same session.
+                    if (CaffeineController.isActive()) CaffeineController.rearm(context)
                 }
             }
         },

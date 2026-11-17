@@ -18,6 +18,7 @@ object CaffeineState {
 object CaffeineController {
     const val ACTION_STOP = "com.laffy.caffeine.STOP"
     const val ACTION_EXTEND = "com.laffy.caffeine.EXTEND"
+    const val ACTION_REARM = "com.laffy.caffeine.REARM"
     const val EXTRA_DURATION = "duration"
     const val EXTRA_START_AT = "start_at"
 
@@ -53,6 +54,15 @@ object CaffeineController {
     fun extend(context: Context) {
         val app = context.applicationContext
         app.startService(Intent(app, CaffeineService::class.java).setAction(ACTION_EXTEND))
+    }
+
+    /**
+     * Re-applies the current session without starting a new one (e.g. after [Prefs.dimScreen]
+     * changes the wake-lock level). The service keeps [Session.startAt]/[Session.endAt].
+     */
+    fun rearm(context: Context) {
+        val app = context.applicationContext
+        app.startService(Intent(app, CaffeineService::class.java).setAction(ACTION_REARM))
     }
 
     /** Tile tap: Off → 10 → 15 → 20 → ∞ → Off. */

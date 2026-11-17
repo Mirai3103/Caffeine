@@ -70,6 +70,15 @@ class CaffeineService : Service() {
                 CaffeineState.session.value = extended
                 arm(extended)
             }
+            CaffeineController.ACTION_REARM -> {
+                // Same session, new wake-lock level: never reset startAt/endAt.
+                val current = CaffeineState.session.value
+                if (current == null || !current.isActive(System.currentTimeMillis())) {
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                arm(current)
+            }
             else -> {
                 val duration = decodeDuration(
                     intent?.getIntExtra(CaffeineController.EXTRA_DURATION, 0) ?: 0
