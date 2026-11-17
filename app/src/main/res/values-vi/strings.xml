@@ -4,7 +4,6 @@
     <string name="status_off">Màn hình tắt theo thời gian của hệ thống</string>
     <string name="duration">Thời gian</string>
     <string name="minutes_short">%d phút</string>
-    <string name="turn_off">Tắt</string>
     <string name="add_tile">Thêm vào Cài đặt nhanh</string>
     <string name="tile_until">Đến %s</string>
     <string name="tile_off">Tắt</string>

@@ -85,7 +85,9 @@ class CaffeineService : Service() {
     }
 
     /** (Re)applies [session]: notification, wake lock and timeout. Replaces, never stacks. */
-    @SuppressLint("WakelockTimeout") // ∞ sessions are bounded by the battery-low guard, not a timeout.
+    @SuppressLint("WakelockTimeout", "Wakelock")
+    // ∞ sessions are bounded by the battery-low guard, not a timeout. The lock intentionally
+    // outlives arm(); release() is conditional because it only replaces a level change.
     private fun arm(session: Session) {
         val now = System.currentTimeMillis()
 
