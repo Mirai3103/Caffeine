@@ -1,109 +1,144 @@
 package com.laffy.caffeine
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.annotation.SuppressLint
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
-import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 
 /**
- * Foreground service that holds a screen wake lock until [CaffeineController.EXTRA_END_AT].
+ * Foreground service that holds a screen wake lock for the current [Session] (timed or ∞).
  * The countdown in the notification is drawn by the system (chronometer), so the app does no
- * periodic work: one timed wake lock + one delayed message, nothing else.
+ * periodic work: one wake lock, at most one delayed message, and guard receivers that exist only
+ * while this service runs.
  */
 class CaffeineService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val timeout = Runnable { stopSelf() }
     private var wakeLock: PowerManager.WakeLock? = null
+    private var wakeLockLevel = 0
+
+    private val guards = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val stop = when (intent.action) {
+                Intent.ACTION_SCREEN_OFF -> Prefs.stopOnScreenOff(context)
+                Intent.ACTION_POWER_DISCONNECTED -> Prefs.stopOnUnplug(context)
+                Intent.ACTION_BATTERY_LOW -> true
+                else -> false
+            }
+            if (stop) CaffeineController.stop(context)
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onCreate() {
+        super.onCreate()
+        ContextCompat.registerReceiver(
+            this, guards,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+                addAction(Intent.ACTION_BATTERY_LOW)
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP) {
-            CaffeineController.stop(this)
-            return START_NOT_STICKY
+        when (intent?.action) {
+            CaffeineController.ACTION_STOP -> {
+                CaffeineController.stop(this)
+                return START_NOT_STICKY
+            }
+            CaffeineController.ACTION_EXTEND -> {
+                val extended = CaffeineState.session.value?.extendedBy(EXTEND_MINUTES, System.currentTimeMillis())
+                if (extended == null) {
+                    // Stale "+5 min" (session already over): never start a new one.
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                CaffeineState.session.value = extended
+                arm(extended)
+            }
+            CaffeineController.ACTION_REARM -> {
+                // Same session, new wake-lock level: never reset startAt/endAt.
+                val current = CaffeineState.session.value
+                if (current == null || !current.isActive(System.currentTimeMillis())) {
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                arm(current)
+            }
+            else -> {
+                val duration = decodeDuration(
+                    intent?.getIntExtra(CaffeineController.EXTRA_DURATION, 0) ?: 0
+                )
+                val startAt = intent?.getLongExtra(CaffeineController.EXTRA_START_AT, 0L)
+                    ?.takeIf { it > 0L } ?: System.currentTimeMillis()
+                val session = duration.toSession(startAt)
+                CaffeineState.session.value = session
+                arm(session)
+            }
         }
-
-        val now = System.currentTimeMillis()
-        val endAt = intent?.getLongExtra(CaffeineController.EXTRA_END_AT, 0L) ?: 0L
-        val remaining = (endAt - now).coerceAtLeast(1_000L)
-
-        // Must run promptly after startForegroundService().
-        val notification = buildNotification(now + remaining)
-        if (Build.VERSION.SDK_INT >= 34) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
-        }
-
-        @Suppress("DEPRECATION") // Still the only way to keep the screen on without an Activity window.
-        val lock = wakeLock ?: (getSystemService(Context.POWER_SERVICE) as PowerManager)
-            .newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Caffeine:keepAwake")
-            .apply { setReferenceCounted(false) }
-            .also { wakeLock = it }
-        lock.acquire(remaining) // Auto-releases even if we get killed.
-
-        handler.removeCallbacks(timeout)
-        handler.postDelayed(timeout, remaining)
-
-        CaffeineState.endAt.value = now + remaining
-        CaffeineTileService.requestUpdate(this)
         return START_NOT_STICKY
     }
 
+    /** (Re)applies [session]: notification, wake lock and timeout. Replaces, never stacks. */
+    @SuppressLint("WakelockTimeout", "Wakelock")
+    // ∞ sessions are bounded by the battery-low guard, not a timeout. The lock intentionally
+    // outlives arm(); release() is conditional because it only replaces a level change.
+    private fun arm(session: Session) {
+        val now = System.currentTimeMillis()
+
+        // Must run promptly after startForegroundService().
+        val notification = buildCaffeineNotification(this, session)
+        if (Build.VERSION.SDK_INT >= 34) {
+            startForeground(CAFFEINE_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(CAFFEINE_NOTIFICATION_ID, notification)
+        }
+
+        @Suppress("DEPRECATION") // Still the only way to keep the screen on without an Activity window.
+        val level = if (Prefs.dimScreen(this)) PowerManager.SCREEN_DIM_WAKE_LOCK
+        else PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+        if (wakeLock != null && wakeLockLevel != level) {
+            wakeLock?.takeIf { it.isHeld }?.release()
+            wakeLock = null
+        }
+        val lock = wakeLock ?: (getSystemService(Context.POWER_SERVICE) as PowerManager)
+            .newWakeLock(level, "Caffeine:keepAwake")
+            .apply { setReferenceCounted(false) }
+            .also { wakeLock = it; wakeLockLevel = level }
+
+        handler.removeCallbacks(timeout)
+        val remaining = session.remainingMs(now)
+        if (remaining == null) {
+            lock.acquire()
+        } else {
+            lock.acquire(remaining.coerceAtLeast(1_000L)) // Auto-releases even if we get killed.
+            handler.postDelayed(timeout, remaining.coerceAtLeast(1_000L))
+        }
+
+        CaffeineTileService.requestUpdate(this)
+    }
+
     override fun onDestroy() {
+        unregisterReceiver(guards)
         handler.removeCallbacks(timeout)
         wakeLock?.takeIf { it.isHeld }?.release()
         wakeLock = null
-        CaffeineState.endAt.value = 0L
+        CaffeineState.session.value = null
         CaffeineTileService.requestUpdate(this)
         super.onDestroy()
-    }
-
-    private fun buildNotification(endAt: Long): android.app.Notification {
-        val nm = getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CHANNEL_ID) == null) {
-            nm.createNotificationChannel(
-                NotificationChannel(
-                    CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_LOW
-                ).apply { setShowBadge(false) }
-            )
-        }
-        val open = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
-        )
-        val stop = PendingIntent.getService(
-            this, 1,
-            Intent(this, CaffeineService::class.java).setAction(ACTION_STOP),
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_coffee)
-            .setContentTitle(getString(R.string.notif_title))
-            .setContentIntent(open)
-            .addAction(0, getString(R.string.notif_stop), stop)
-            .setWhen(endAt)
-            .setShowWhen(true)
-            .setUsesChronometer(true)
-            .setChronometerCountDown(true)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .build()
-    }
-
-    private companion object {
-        const val ACTION_STOP = "com.laffy.caffeine.STOP"
-        const val CHANNEL_ID = "caffeine"
-        const val NOTIFICATION_ID = 1
     }
 }

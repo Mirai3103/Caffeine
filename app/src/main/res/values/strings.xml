@@ -4,13 +4,34 @@
     <string name="status_off">Screen follows the system timeout</string>
     <string name="duration">Duration</string>
     <string name="minutes_short">%d min</string>
-    <string name="duration_hint">Applies the next time you turn Caffeine on.</string>
-    <string name="turn_on">Turn on</string>
-    <string name="turn_off">Turn off</string>
     <string name="add_tile">Add to Quick Settings</string>
     <string name="tile_until">Until %s</string>
     <string name="tile_off">Off</string>
+    <string name="tile_infinite">No limit</string>
+    <string name="shortcut_10">10 minutes</string>
+    <string name="shortcut_20">20 minutes</string>
+    <string name="shortcut_inf">No limit</string>
+    <string name="shortcut_stop">Turn off</string>
     <string name="channel_name">Caffeine active</string>
     <string name="notif_title">Keeping the screen on</string>
     <string name="notif_stop">Turn off</string>
+    <string name="notif_extend">+5 min</string>
+    <string name="notif_title_infinite">Keeping the screen on (no limit)</string>
+    <string name="low_battery">Battery low — Caffeine stays off</string>
+    <string name="custom">Custom…</string>
+    <string name="custom_title">Custom duration</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="infinite">∞</string>
+    <string name="infinite_cd">No limit</string>
+    <string name="options">Options</string>
+    <string name="opt_screen_off">Turn off when screen turns off</string>
+    <string name="opt_unplug">Stop when unplugged</string>
+    <string name="opt_dim">Dim instead of bright</string>
+    <string name="hero_state_on">On</string>
+    <string name="hero_state_off">Off</string>
+    <plurals name="remaining_cd">
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
+    </plurals>
 </resources>
