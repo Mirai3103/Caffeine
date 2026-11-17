@@ -30,6 +30,8 @@
     <string name="opt_dim">Dim instead of bright</string>
     <string name="hero_state_on">On</string>
     <string name="hero_state_off">Off</string>
+    <string name="privacy">Privacy policy</string>
+    <string name="privacy_unavailable">Couldn\'t open a browser. Copy the link:</string>
     <plurals name="remaining_cd">
         <item quantity="one">%d minute left</item>
         <item quantity="other">%d minutes left</item>
