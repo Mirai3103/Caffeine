@@ -180,10 +180,12 @@ internal fun CaffeineContent(
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(32.dp)
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    hero()
-                    controls()
+                    // Groups, so spacedBy only separates hero from controls instead of
+                    // adding a gap between every node HeroSection/ControlsSection emit.
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) { hero() }
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) { controls() }
                 }
             }
         }
