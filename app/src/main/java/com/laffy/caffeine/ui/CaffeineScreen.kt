@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
@@ -64,6 +65,15 @@ import kotlinx.coroutines.delay
 
 private const val SECOND = 1_000L
 private const val MINUTE = 60_000L
+
+/** Material "medium" window width: from here up the screen fits two panes side by side. */
+private val TwoPaneMinWidth = 600.dp
+
+/** Keeps the panes from drifting apart on very wide windows (desktop, unfolded tablets). */
+private val TwoPaneMaxWidth = 1000.dp
+
+/** Reading width for the single-column layout on portrait tablets. */
+private val SinglePaneMaxWidth = 560.dp
 
 /** State wiring: collects the session, ticks once per second (visible screen only), writes prefs. */
 @Composable
@@ -151,6 +161,9 @@ internal fun CaffeineContent(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(innerPadding)) {
+            // Medium/expanded landscape windows (tablets, unfolded foldables, desktop) get two
+            // panes side by side. Portrait and compact windows keep the single centered column.
+            val twoPane = maxWidth >= TwoPaneMinWidth && maxWidth > maxHeight
             val hero: @Composable () -> Unit = {
                 HeroSection(session, now, reducedMotion, onToggle, onExtend)
             }
@@ -160,33 +173,54 @@ internal fun CaffeineContent(
                     onSelect, onOption, onAddTile, onPrivacy
                 )
             }
-            if (maxWidth > maxHeight) {
-                Row(
-                    Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    Column(
-                        Modifier.weight(1f).fillMaxSize().verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) { hero() }
-                    Column(
-                        Modifier.weight(1f).fillMaxSize().verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) { controls() }
-                }
-            } else {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    // Order matters: the scroll modifier receives infinite height, so the
+                    // minimum has to be applied inside it for vertical centering to work.
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = maxHeight)
+                    .padding(
+                        horizontal = if (twoPane) 32.dp else 24.dp,
+                        vertical = if (twoPane) 24.dp else 16.dp,
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(
+                    space = if (twoPane) 48.dp else 24.dp,
+                    alignment = Alignment.CenterVertically,
+                ),
+            ) {
+                if (twoPane) {
+                    Row(
+                        // widthIn first: after fillMaxWidth the incoming width is already
+                        // pinned to the parent's, so the cap would have no effect.
+                        Modifier.widthIn(max = TwoPaneMaxWidth).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(48.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) { hero() }
+                        Column(
+                            Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(24.dp),
+                        ) { controls() }
+                    }
+                } else {
                     // Groups, so spacedBy only separates hero from controls instead of
                     // adding a gap between every node HeroSection/ControlsSection emit.
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) { hero() }
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) { controls() }
+                    Column(
+                        Modifier.widthIn(max = SinglePaneMaxWidth).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) { hero() }
+                        Column(
+                            Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                        ) { controls() }
+                    }
                 }
             }
         }
@@ -356,6 +390,14 @@ private fun PreviewInfinite() = CaffeineTheme { PreviewScreen(previewInfinite(),
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
 private fun PreviewLandscape() = CaffeineTheme { PreviewScreen(previewTimed(), Duration.Minutes(35)) }
+
+@Preview(showBackground = true, widthDp = 1280, heightDp = 800)
+@Composable
+private fun PreviewTabletLandscape() = CaffeineTheme { PreviewScreen(previewTimed(), Duration.Minutes(35)) }
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 1280)
+@Composable
+private fun PreviewTabletPortrait() = CaffeineTheme { PreviewScreen(previewTimed(), showAddTile = true) }
 
 @Preview(showBackground = true, heightDp = 900, fontScale = 2f)
 @Composable
